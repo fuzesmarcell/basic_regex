@@ -72,11 +72,5 @@ public class Main {
             testCase(nfa, "abcba", false);
             testCase(nfa, "abcbabb", false);
         }
-
     }
 }
-
-// parse expression
-// expr2 [( expr)]
-// expr1 [*]
-// expr0 [+]
