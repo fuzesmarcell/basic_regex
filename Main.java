@@ -39,6 +39,40 @@ public class Main {
             testCase(nfa, "11", false);
         }
 
+        {
+            String input = "ab+cba";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "ab", true);
+            testCase(nfa, "cba", true);
+            testCase(nfa, "abc", false);
+            testCase(nfa, "ba", false);
+            testCase(nfa, "abcba", false);
+        }
+
+        {
+            String input = "ab+cba+bb";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "ab", true);
+            testCase(nfa, "cba", true);
+            testCase(nfa, "bb", true);
+            testCase(nfa, "bbb", false);
+            testCase(nfa, "ba", false);
+            testCase(nfa, "abcba", false);
+            testCase(nfa, "abcbabb", false);
+        }
+
     }
 }
 
