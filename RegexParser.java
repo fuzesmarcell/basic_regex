@@ -8,9 +8,6 @@ public class RegexParser {
         this.tokenizer.nextToken();
     }
 
-    public void parseExpr3() {
-    }
-
     public NFA parseExpr2() {
         if (tokenizer.isToken(TokenKind.String)) {
             Integer q0 = 0;

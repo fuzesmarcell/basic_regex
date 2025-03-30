@@ -3,6 +3,9 @@ public class Main {
     public static void testCase(NFA nfa, String E, boolean expected) {
         boolean matched = nfa.execute(E);
         System.out.printf("\tTest: \"%s\" %s\n", E, (expected == matched) ? "PASS" : "FAIL\n");
+        if (expected != matched) {
+            throw new RuntimeException("Test failed");
+        }
     }
 
     public static void main(String[] args) {
@@ -71,6 +74,19 @@ public class Main {
             testCase(nfa, "ba", false);
             testCase(nfa, "abcba", false);
             testCase(nfa, "abcbabb", false);
+        }
+
+        {
+            String input = "hello";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "hello", true);
+            testCase(nfa, "helo", false);
         }
     }
 }
