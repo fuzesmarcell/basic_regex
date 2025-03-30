@@ -68,7 +68,7 @@ public class RegexParser {
         while (tokenizer.matchToken(TokenKind.Star)) {
             a = NFA.kleeneIteration(a);
             if (!tokenizer.isToken(TokenKind.EOF)) {
-                a = NFA.concat(a, parseExpr2());
+                a = NFA.concat(a, parseExpr());
             }
         }
 

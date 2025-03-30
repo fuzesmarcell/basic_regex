@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class Main {
 
     public static void testCase(NFA nfa, String E, boolean expected) {
@@ -205,8 +209,7 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
-
+    public static void pptTests() {
         {
             String input = "0(01+10)1";
             System.out.printf("Test Suite: \"%s\"\n", input);
@@ -287,11 +290,71 @@ public class Main {
             testCase(nfa, "1", false);
         }
 
-        // TODO: Special character tests!
-        // TODO: Epsilon character handling!
+        // TODO: (0*1(0)*1(0)*1)*0*
+        // our operator precedence is actually incorrect
+        // parens are also concat
+        // parens > iteration > concat > union
+        {
+            String input = "(0*1(0)*1(0)*1)*0*"; // TODO: This should actually be (0*10*10*1)*0*
+            System.out.printf("Test Suite: \"%s\"\n", input);
 
-        concatTests();
-        unionTests();
-        miscTests();
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "111", true);
+            testCase(nfa, "111111", true);
+            testCase(nfa, "11111", false);
+            testCase(nfa, "1", false);
+            testCase(nfa, "00001110000", true);
+            testCase(nfa, "0100100010010110", true);
+            testCase(nfa, "10001100001001", false);
+            testCase(nfa, "0110", false);
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        // TODO: Add ^ operator as well for shorthand
+        // TODO: Handle all characters
+        // TODO: Handle epsilon characters as well?
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+
+        while (true) {
+            System.out.print("Enter a operation [test, re (regex), q (quit)]: ");
+            String s = r.readLine();
+            if (s.equals("test")) {
+                concatTests();
+                unionTests();
+                miscTests();
+                pptTests();
+            } else if (s.equals("q")) {
+                break;
+            } else if (s.equals("re")) {
+                System.out.print("Enter your regex: ");
+                String re = r.readLine();
+
+                Tokenizer tokenizer = new Tokenizer(re);
+                RegexParser parser = new RegexParser(tokenizer);
+                NFA nfa = parser.parseExpr();
+
+                System.out.println("test or dump vizualization?");
+                String m = r.readLine();
+                if (m.equals("test")) {
+                    while (true) {
+                        System.out.print("Test abc: ");
+                        String input = r.readLine();
+                        if (input.equals("q")) {
+                            break;
+                        }
+
+                        System.out.printf("Recognized: %s\n", nfa.execute(input));
+                    }
+                } else {
+                    nfa.debugDumpGraphViz();
+                }
+            }
+        }
     }
 }

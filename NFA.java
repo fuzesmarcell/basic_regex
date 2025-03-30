@@ -12,40 +12,52 @@ public class NFA {
     }
 
     public boolean execute(int q, int pos, String E) {
+        if (!d.containsKey(q)) { // sanity check this should never happen
+            throw new RuntimeException("Transition should always have a key");
+        }
+
         boolean isEndState = F.contains(q);
+
         if (pos >= E.length()) {
-            return isEndState;
-        }
+            if (isEndState) {
+                return true;
+            }
 
-        Character c = E.charAt(pos);
+            if (d.get(q) == null) {
+                return false;
+            }
 
-        if (d.get(q) == null) {
-            return false;
-        }
-
-        if (!d.get(q).containsKey(c) && !d.get(q).containsKey('\0')) {
-            return false;
-        }
-
-        Set<Integer> epsilonStates = d.get(q).get('\0');
-        Set<Integer> states = d.get(q).get(c);
-
-        if (states == null && epsilonStates == null) {
-            return false;
-        }
-
-        if (epsilonStates != null) {
-            for (Integer state : epsilonStates) {
-                if (execute(state, pos, E)) {
-                    return true;
+            // still need to explore epsilon transitions if possible
+            if (d.get(q).containsKey('\0')) {
+                Set<Integer> epsilonStates = d.get(q).get('\0');
+                for (Integer state : epsilonStates) {
+                    if (execute(state, pos, E)) {
+                        return true;
+                    }
                 }
             }
-        }
+        } else {
+            if (d.get(q) == null) {
+                return false;
+            }
 
-        if (states != null) {
-            for (Integer state : states) {
-                if (execute(state, ++pos, E)) {
-                    return true;
+            if (d.get(q).containsKey('\0')) {
+                for (Integer state : d.get(q).get('\0')) {
+                    if (execute(state, pos, E)) {
+                        return true;
+                    }
+                }
+            }
+
+            Character c = E.charAt(pos);
+
+            var nextTransitions = d.get(q);
+            if (nextTransitions.containsKey(c)) {
+                var states = d.get(q).get(c);
+                for (Integer state : states) {
+                    if (execute(state, ++pos, E)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -184,6 +196,7 @@ public class NFA {
     }
 
     public void debugDumpGraphViz() {
+        System.out.println("digraph finite_state_machine {");
         System.out.println("rankdir=LR");
         System.out.println("node [shape = plaintext]; start;");
         System.out.println("node [shape = circle]");
@@ -206,13 +219,18 @@ public class NFA {
                 for (Map.Entry<Character, Set<Integer>> e : m.entrySet()) {
                     for (Integer q : e.getValue()) {
                         Character c = e.getKey();
+                        String color = "black";
                         if (c == '\0') {
-                            c = 'ë';
+                            color = "red";
+                            c = 'ε';
                         }
-                        System.out.printf("%d -> %d [label = %c]\n", entry.getKey(), q, c);
+
+                        System.out.printf("%d -> %d [label = %c color = %s]\n", entry.getKey(), q, c, color);
                     }
                 }
             }
         }
+
+        System.out.println("}");
     }
 }
