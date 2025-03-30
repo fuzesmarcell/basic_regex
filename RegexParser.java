@@ -13,8 +13,8 @@ public class RegexParser {
             Integer q0 = 0;
             Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
 
-            for (int i = 0; i < tokenizer.currToken.value.length(); i++) {
-                Character c = tokenizer.currToken.value.charAt(i);
+            for (int i = 0; i < tokenizer.currToken.str.length(); i++) {
+                Character c = tokenizer.currToken.str.charAt(i);
 
                 Map<Character, Set<Integer>> innerMap = new HashMap<>();
                 innerMap.put(c, new HashSet<>(Set.of(i+1)));
@@ -22,7 +22,7 @@ public class RegexParser {
                 d.put(i, innerMap);
             }
 
-            Integer endState = tokenizer.currToken.value.length();
+            Integer endState = tokenizer.currToken.str.length();
             d.put(endState, null);
 
             NFA nfa = new NFA(q0, d, new HashSet<>(Set.of(endState)));
@@ -42,6 +42,18 @@ public class RegexParser {
 
     public NFA parseExpr2() {
         NFA a = parseExpr3();
+        while (tokenizer.matchToken(TokenKind.Star)) {
+            a = NFA.kleeneIteration(a);
+            if (!tokenizer.isToken(TokenKind.EOF)) {
+                a = NFA.concat(a, parseExpr());
+            }
+        }
+
+        return a;
+    }
+
+    public NFA parseExpr1() {
+        NFA a = parseExpr2();
         while (tokenizer.isToken(TokenKind.ParenOpen) || tokenizer.isToken(TokenKind.String)) {
             TokenKind kind = tokenizer.currToken.kind;
 
@@ -55,20 +67,8 @@ public class RegexParser {
                 }
                 a = NFA.concat(a, b);
             } else {
-                NFA b = parseExpr3();
+                NFA b = parseExpr2();
                 a = NFA.concat(a, b);
-            }
-        }
-
-        return a;
-    }
-
-    public NFA parseExpr1() {
-        NFA a = parseExpr2();
-        while (tokenizer.matchToken(TokenKind.Star)) {
-            a = NFA.kleeneIteration(a);
-            if (!tokenizer.isToken(TokenKind.EOF)) {
-                a = NFA.concat(a, parseExpr());
             }
         }
 
@@ -77,21 +77,26 @@ public class RegexParser {
 
     public NFA parseExpr0() {
         NFA a = parseExpr1();
-        while (tokenizer.isToken(TokenKind.Plus)) {
+        while (tokenizer.isToken(TokenKind.Plus) || tokenizer.isToken(TokenKind.Hat)) {
             TokenKind kind = tokenizer.currToken.kind;
             tokenizer.nextToken();
-            NFA b = parseExpr1();
-            a = NFA.union(a, b);
+            if (kind == TokenKind.Hat) {
+                int iters = tokenizer.currToken.val;
+                tokenizer.expectToken(TokenKind.Number);
+                NFA b = new NFA(a.q0, a.d, a.F);
+                for (int i = 0; i < iters-1; i++) {
+                    a = NFA.concat(a, b);
+                }
+            } else {
+                NFA b = parseExpr1();
+                a = NFA.union(a, b);
+            }
         }
 
         return a;
     }
 
-    // expr3 = String | '(' expr ')'
-    // expr2 = expr3(*, expr3)
-    // expr1 = expr2(cat, expr2)
-    // expr0 = expr1(+ expr1)
-    // expr = expr0
+    // iteration > concat|powerof > union
     public NFA parseExpr() {
         return parseExpr0();
     }

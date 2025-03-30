@@ -255,7 +255,7 @@ public class Main {
         }
 
         {
-            String input = "(00)*";
+            String input = "(0^2)*";
             System.out.printf("Test Suite: \"%s\"\n", input);
 
             Tokenizer tokenizer = new Tokenizer(input);
@@ -290,12 +290,8 @@ public class Main {
             testCase(nfa, "1", false);
         }
 
-        // TODO: (0*1(0)*1(0)*1)*0*
-        // our operator precedence is actually incorrect
-        // parens are also concat
-        // parens > iteration > concat > union
         {
-            String input = "(0*1(0)*1(0)*1)*0*"; // TODO: This should actually be (0*10*10*1)*0*
+            String input = "(0*10*10*1)*0*";
             System.out.printf("Test Suite: \"%s\"\n", input);
 
             Tokenizer tokenizer = new Tokenizer(input);

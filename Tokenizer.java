@@ -29,6 +29,21 @@ public class Tokenizer {
         }
     }
 
+    public boolean isTokenNext(TokenKind kind) {
+        int oldPos = pos;
+        Token oldToken = currToken;
+
+        nextToken();
+
+        boolean result = currToken.kind == kind;
+
+        // rewind back
+        pos = oldPos;
+        currToken = oldToken;
+
+        return result;
+    }
+
     public void nextToken() {
         if (pos >= input.length()) {
             currToken = new Token(TokenKind.EOF);
@@ -36,7 +51,8 @@ public class Tokenizer {
         }
 
         Token result = new Token(TokenKind.EOF);
-        switch (input.charAt(pos)) {
+        char c = input.charAt(pos);
+        switch (c) {
             case '(':
                 result.kind = TokenKind.ParenOpen;
                 ++pos;
@@ -57,22 +73,49 @@ public class Tokenizer {
                 result.kind = TokenKind.Dollar;
                 ++pos;
                 break;
+            case '^':
+                result.kind = TokenKind.Hat;
+                ++pos;
+                break;
             default:
-                int endPos = pos;
-                // TODO: Handle other characters and escape characters
-                for (int i = pos; i < input.length(); ++i) {
-                    char c = input.charAt(i);
-                    if (Character.isDigit(c) || Character.isLetter(c)) {
-                        ++endPos;
-                    } else {
-                        break;
+                if (currToken.kind == TokenKind.Hat && Character.isDigit(c)) {
+                    result.kind = TokenKind.Number;
+                    int endPos = pos+1;
+                    for (int i = pos+1; i < input.length(); ++i) {
+                        if (!Character.isDigit(input.charAt(i))) {
+                            endPos = i;
+                            break;
+                        }
                     }
+
+                    String num = input.substring(pos, endPos);
+                    result.val = Integer.parseInt(num);
+                    pos = endPos;
+                } else {
+                    result.kind = TokenKind.String;
+
+                    int endPos = pos;
+                    do {
+                        char nextC = input.charAt(endPos);
+                        if (nextC == '(' || nextC == ')' ||
+                            nextC == '*' || nextC == '+' ||
+                            nextC == '^' || nextC == '$') {
+                            break;
+                        }
+                    } while (++endPos < input.length());
+
+                    if (endPos - pos > 1) {
+                        if (endPos < input.length()) {
+                            char nextC = input.charAt(endPos);
+                            if (nextC == '*') {
+                                endPos -= 1;
+                            }
+                        }
+                    }
+
+                    result.str = input.substring(pos, endPos);
+                    pos = endPos;
                 }
-
-                result.kind = TokenKind.String;
-                result.value = input.substring(pos, endPos);
-
-                pos = endPos;
 
                 break;
         }

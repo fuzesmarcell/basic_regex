@@ -78,18 +78,21 @@ public class NFA {
             Integer q = stm.getStateA(aq);
 
             Map<Character, Set<Integer>> m = entry.getValue();
+
             if (m != null) {
+                Map<Character, Set<Integer>> newM = new HashMap<>();
                 for (Map.Entry<Character, Set<Integer>> e : m.entrySet()) {
                     Set<Integer> s = new HashSet<>();
                     for (Integer state : e.getValue()) {
                         s.add(stm.getStateA(state));
                     }
 
-                    e.setValue(s);
+                    newM.put(e.getKey(), s);
                 }
+                d.put(q, newM);
+            } else {
+                d.put(q, null);
             }
-
-            d.put(q, m);
         }
 
         for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : b.d.entrySet()) {
@@ -97,18 +100,21 @@ public class NFA {
             Integer q = stm.getStateB(bq);
 
             Map<Character, Set<Integer>> m = entry.getValue();
+
             if (m != null) {
+                Map<Character, Set<Integer>> newM = new HashMap<>();
                 for (Map.Entry<Character, Set<Integer>> e : m.entrySet()) {
                     Set<Integer> s = new HashSet<>();
                     for (Integer state : e.getValue()) {
                         s.add(stm.getStateB(state));
                     }
 
-                    e.setValue(s);
+                    newM.put(e.getKey(), s);
                 }
+                d.put(q, newM);
+            } else {
+                d.put(q, null);
             }
-
-            d.put(q, entry.getValue());
         }
 
         return d;

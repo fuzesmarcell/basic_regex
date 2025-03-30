@@ -4,6 +4,8 @@ public enum TokenKind {
     Plus,
     Star,
     Dollar,
+    Hat,
     String,
+    Number,
     EOF,
 }
