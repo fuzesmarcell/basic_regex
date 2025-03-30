@@ -8,7 +8,7 @@ public class RegexParser {
         this.tokenizer.nextToken();
     }
 
-    public NFA parseExpr2() {
+    public NFA parseExpr3() {
         if (tokenizer.isToken(TokenKind.String)) {
             Integer q0 = 0;
             Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
@@ -40,19 +40,35 @@ public class RegexParser {
         }
     }
 
-    public NFA parseExpr1() {
-        NFA a = parseExpr2();
+    public NFA parseExpr2() {
+        NFA a = parseExpr3();
         while (tokenizer.isToken(TokenKind.ParenOpen) || tokenizer.isToken(TokenKind.String)) {
             TokenKind kind = tokenizer.currToken.kind;
 
             if (kind == TokenKind.ParenOpen) {
                 tokenizer.nextToken();
                 NFA b = parseExpr();
-                a = NFA.concat(a, b);
                 tokenizer.expectToken(TokenKind.ParenClose);
-            } else {
-                NFA b = parseExpr2();
+                if (tokenizer.isToken(TokenKind.Star)) {
+                    tokenizer.nextToken();
+                    b = NFA.kleeneIteration(b);
+                }
                 a = NFA.concat(a, b);
+            } else {
+                NFA b = parseExpr3();
+                a = NFA.concat(a, b);
+            }
+        }
+
+        return a;
+    }
+
+    public NFA parseExpr1() {
+        NFA a = parseExpr2();
+        while (tokenizer.matchToken(TokenKind.Star)) {
+            a = NFA.kleeneIteration(a);
+            if (!tokenizer.isToken(TokenKind.EOF)) {
+                a = NFA.concat(a, parseExpr2());
             }
         }
 

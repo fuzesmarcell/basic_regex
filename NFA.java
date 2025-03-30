@@ -136,10 +136,18 @@ public class NFA {
         for (Integer endStateA : a.F) {
             Integer q = stm.getStateA(endStateA);
 
-            Map<Character, Set<Integer>> innerMap = new HashMap<>();
-            innerMap.put('\0', new HashSet<>(Set.of(startStateB)));
-
-            d.put(q, innerMap);
+            var jumps = d.get(q);
+            if (jumps == null) {
+                Map<Character, Set<Integer>> innerMap = new HashMap<>();
+                innerMap.put('\0', new HashSet<>(Set.of(startStateB)));
+                d.put(q, innerMap);
+            } else {
+                if (jumps.containsKey('\0')) {
+                    jumps.get('\0').add(startStateB);
+                } else {
+                    jumps.put('\0', Set.of(startStateB));
+                }
+            }
         }
 
         Set<Integer> F = new HashSet<>();
@@ -148,6 +156,31 @@ public class NFA {
         }
 
         return new NFA(q0, d, F);
+    }
+
+    public static NFA kleeneIteration(NFA a) {
+        Set<Integer> states = new HashSet<>();
+        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : a.d.entrySet()) {
+            states.add(entry.getKey());
+        }
+
+        Integer q0 = Collections.max(states)+1;
+
+        NFA result = new NFA(a.q0, a.d, a.F) ;
+        result.q0 = q0;
+        result.F.add(result.q0);
+
+        Map<Character, Set<Integer>> innerMap = new HashMap<>();
+        innerMap.put('\0', new HashSet<>(Set.of(a.q0)));
+        result.d.put(q0, innerMap);
+
+        for (Integer q : a.F) {
+            Map<Character, Set<Integer>> im = new HashMap<>();
+            im.put('\0', new HashSet<>(Set.of(a.q0)));
+            result.d.put(q, im);
+        }
+
+        return result;
     }
 
     public void debugDumpGraphViz() {

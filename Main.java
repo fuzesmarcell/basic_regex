@@ -222,7 +222,74 @@ public class Main {
             testCase(nfa, "001", false);
         }
 
+        {
+            String input = "(0+1)*";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "", true);
+            testCase(nfa, "0111", true);
+            testCase(nfa, "011010101", true);
+        }
+
+        {
+            String input = "0(0+1)*1";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "01", true);
+            testCase(nfa, "0111", true);
+            testCase(nfa, "011010101", true);
+            testCase(nfa, "101010100011001", false);
+        }
+
+        {
+            String input = "(00)*";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "00", true);
+            testCase(nfa, "0000", true);
+            testCase(nfa, "00000000", true);
+            testCase(nfa, "0", false);
+            testCase(nfa, "000", false);
+            testCase(nfa, "11", false);
+            testCase(nfa, "10", false);
+        }
+
+        {
+            String input = "((0*1)(0*1))*0*";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "11", true);
+            testCase(nfa, "0110", true);
+            testCase(nfa, "101", true);
+            testCase(nfa, "10100101", true);
+            testCase(nfa, "10100100", false);
+            testCase(nfa, "10", false);
+            testCase(nfa, "1", false);
+        }
+
         // TODO: Special character tests!
+        // TODO: Epsilon character handling!
+
         concatTests();
         unionTests();
         miscTests();
