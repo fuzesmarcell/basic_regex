@@ -42,12 +42,18 @@ public class RegexParser {
 
     public NFA parseExpr1() {
         NFA a = parseExpr2();
-        while (tokenizer.isToken(TokenKind.Star)) {
+        while (tokenizer.isToken(TokenKind.ParenOpen) || tokenizer.isToken(TokenKind.String)) {
             TokenKind kind = tokenizer.currToken.kind;
-            tokenizer.nextToken();
-            NFA b = parseExpr2();
-            // TODO: Kleene iteration this is a unary expression actually but
-            // from the other way around actually...
+
+            if (kind == TokenKind.ParenOpen) {
+                tokenizer.nextToken();
+                NFA b = parseExpr();
+                a = NFA.concat(a, b);
+                tokenizer.expectToken(TokenKind.ParenClose);
+            } else {
+                NFA b = parseExpr2();
+                a = NFA.concat(a, b);
+            }
         }
 
         return a;

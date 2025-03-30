@@ -149,4 +149,37 @@ public class NFA {
 
         return new NFA(q0, d, F);
     }
+
+    public void debugDumpGraphViz() {
+        System.out.println("rankdir=LR");
+        System.out.println("node [shape = plaintext]; start;");
+        System.out.println("node [shape = circle]");
+        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : d.entrySet()) {
+            Integer q = entry.getKey();
+            if (!F.contains(q)) {
+                System.out.println(q);
+            }
+        }
+        System.out.println("node [shape = doublecircle]");
+        for (Integer q : F) {
+            System.out.println(q);
+        }
+
+        System.out.printf("start -> %d\n", q0);
+
+        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : d.entrySet()) {
+            Map<Character, Set<Integer>> m = entry.getValue();
+            if (m != null) {
+                for (Map.Entry<Character, Set<Integer>> e : m.entrySet()) {
+                    for (Integer q : e.getValue()) {
+                        Character c = e.getKey();
+                        if (c == '\0') {
+                            c = 'ë';
+                        }
+                        System.out.printf("%d -> %d [label = %c]\n", entry.getKey(), q, c);
+                    }
+                }
+            }
+        }
+    }
 }
