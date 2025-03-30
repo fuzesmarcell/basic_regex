@@ -59,48 +59,18 @@ public class NFA {
         return execute(q, pos, E);
     }
 
-    public static NFA union(NFA a, NFA b) {
-        Map<Integer, Integer> aMap = new HashMap<>();
-        Map<Integer, Integer> bMap = new HashMap<>();
-        Set<Integer> states = new HashSet<>();
-
-        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : a.d.entrySet()) {
-            Integer q = entry.getKey();
-            if (states.contains(q)) {
-                Integer maxq = Collections.max(states);
-                aMap.put(q, maxq+1);
-                states.add(maxq+1);
-            } else {
-                states.add(q);
-                aMap.put(q, q);
-            }
-        }
-
-        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : b.d.entrySet()) {
-            Integer q = entry.getKey();
-            if (states.contains(q)) {
-                Integer maxq = Collections.max(states);
-                bMap.put(q, maxq+1);
-                states.add(maxq+1);
-            } else {
-                states.add(q);
-                bMap.put(q, q);
-            }
-        }
-
-        Integer q0 = Collections.max(states) + 1;
+    public static Map<Integer, Map<Character, Set<Integer>>> combine(NFA a, NFA b, StateMapping stm) {
         Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
-
         for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : a.d.entrySet()) {
             Integer aq = entry.getKey();
-            Integer q = aMap.get(aq);
+            Integer q = stm.getStateA(aq);
 
             Map<Character, Set<Integer>> m = entry.getValue();
             if (m != null) {
                 for (Map.Entry<Character, Set<Integer>> e : m.entrySet()) {
                     Set<Integer> s = new HashSet<>();
                     for (Integer state : e.getValue()) {
-                        s.add(aMap.get(state));
+                        s.add(stm.getStateA(state));
                     }
 
                     e.setValue(s);
@@ -112,14 +82,14 @@ public class NFA {
 
         for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : b.d.entrySet()) {
             Integer bq = entry.getKey();
-            Integer q = bMap.get(bq);
+            Integer q = stm.getStateB(bq);
 
             Map<Character, Set<Integer>> m = entry.getValue();
             if (m != null) {
                 for (Map.Entry<Character, Set<Integer>> e : m.entrySet()) {
                     Set<Integer> s = new HashSet<>();
                     for (Integer state : e.getValue()) {
-                        s.add(bMap.get(state));
+                        s.add(stm.getStateB(state));
                     }
 
                     e.setValue(s);
@@ -129,17 +99,27 @@ public class NFA {
             d.put(q, entry.getValue());
         }
 
+        return d;
+    }
+
+    public static NFA union(NFA a, NFA b) {
+        StateMapping stm = new StateMapping(a, b);
+
+        Integer q0 = stm.getNextFreeState();
+
+        var d = combine(a, b, stm);
+
         Map<Character, Set<Integer>> innerMap = new HashMap<>();
-        innerMap.put('\0', new HashSet<>(Set.of(aMap.get(a.q0), bMap.get(b.q0))));
+        innerMap.put('\0', new HashSet<>(Set.of(stm.getStateA(a.q0), stm.getStateB(b.q0))));
         d.put(q0, innerMap);
 
         Set<Integer> F = new HashSet<>();
         for (Integer q : a.F) {
-            F.add(aMap.get(q));
+            F.add(stm.getStateA(q));
         }
 
         for (Integer q : b.F) {
-            F.add(bMap.get(q));
+            F.add(stm.getStateB(q));
         }
 
         NFA nfa = new NFA(q0, d, F);
@@ -147,79 +127,26 @@ public class NFA {
     }
 
     public static NFA concat(NFA a, NFA b) {
-        // epsilon jumps from all end positions of a
-        // go into all end positions of b
-        // we have to make sure to have unique state values!
-        // end states will be only from b
+        StateMapping stm = new StateMapping(a, b);
+        var d = combine(a, b, stm);
 
-        Map<Integer, Integer> aMap = new HashMap<>();
-        Map<Integer, Integer> bMap = new HashMap<>();
-        Set<Integer> states = new HashSet<>();
+        Integer q0 = stm.getStateA(a.q0);
 
-        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : a.d.entrySet()) {
-            Integer q = entry.getKey();
-            if (states.contains(q)) {
-                Integer maxq = Collections.max(states);
-                aMap.put(q, maxq+1);
-                states.add(maxq+1);
-            } else {
-                states.add(q);
-                aMap.put(q, q);
-            }
+        Integer startStateB = stm.getStateB(b.q0);
+        for (Integer endStateA : a.F) {
+            Integer q = stm.getStateA(endStateA);
+
+            Map<Character, Set<Integer>> innerMap = new HashMap<>();
+            innerMap.put('\0', new HashSet<>(Set.of(startStateB)));
+
+            d.put(q, innerMap);
         }
-
-        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : b.d.entrySet()) {
-            Integer q = entry.getKey();
-            if (states.contains(q)) {
-                Integer maxq = Collections.max(states);
-                bMap.put(q, maxq+1);
-                states.add(maxq+1);
-            } else {
-                states.add(q);
-                bMap.put(q, q);
-            }
-        }
-
-        Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
-        ArrayList<Integer> aEndStatesList = new ArrayList<>();
-        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : a.d.entrySet()) {
-            Integer aq = entry.getKey();
-            Integer q = aMap.get(aq);
-
-            if (Arrays.asList(a.F).contains(aq)) {
-                aEndStatesList.add(q);
-            }
-
-            d.put(q, entry.getValue());
-        }
-
-        for (Map.Entry<Integer, Map<Character, Set<Integer>>> entry : b.d.entrySet()) {
-            Integer bq = entry.getKey();
-            Integer q = bMap.get(bq);
-            d.put(q, entry.getValue());
-        }
-
-        Integer bStartState = bMap.get(b.q0);
-
-        for (int i = 0; i < aEndStatesList.size(); i++) {
-            Integer endState = aEndStatesList.get(i);
-            Map<Character, Set<Integer>> s = d.computeIfAbsent(endState, k -> new HashMap<>());
-
-            if (s.containsKey('\0')) {
-                s.get('\0').add(bStartState);
-            } else {
-                s.put('\0', new HashSet<>(Set.of(bStartState)));
-            }
-        }
-
-        Integer q0 = aMap.get(a.q0);
 
         Set<Integer> F = new HashSet<>();
         for (Integer q : b.F) {
-            F.add(bMap.get(q));
+            F.add(stm.getStateB(q));
         }
 
-        NFA nfa = new NFA(q0, d, F); // TODO: This is incorrect we need to convert b.F to be the new id's
-        return nfa;
+        return new NFA(q0, d, F);
     }
 }

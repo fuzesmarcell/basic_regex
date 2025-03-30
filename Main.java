@@ -8,7 +8,7 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
+    public static void unionTests() {
         {
             String input = "0+1";
             System.out.printf("Test Suite: \"%s\"\n", input);
@@ -88,5 +88,25 @@ public class Main {
             testCase(nfa, "hello", true);
             testCase(nfa, "helo", false);
         }
+    }
+
+    public static void main(String[] args) {
+//        {
+//            String input = "a(b)";
+//            System.out.printf("Test Suite: \"%s\"\n", input);
+//
+//            Tokenizer tokenizer = new Tokenizer(input);
+//            RegexParser parser = new RegexParser(tokenizer);
+//
+//            NFA nfa = parser.parseExpr();
+//
+//            testCase(nfa, "ab", true);
+//            testCase(nfa, "ba", false);
+//            testCase(nfa, "abab", false);
+//            testCase(nfa, "b", false);
+//            testCase(nfa, "a", false);
+//        }
+
+        unionTests();
     }
 }
