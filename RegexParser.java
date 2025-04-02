@@ -9,28 +9,40 @@ public class RegexParser {
     }
 
     public NFA parseExpr3() {
-        if (tokenizer.isToken(TokenKind.String)) {
-            Integer q0 = 0;
-            Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
+        if (tokenizer.isToken(TokenKind.String) || tokenizer.isToken(TokenKind.Dollar)) {
+            TokenKind kind = tokenizer.currToken.kind;
 
-            for (int i = 0; i < tokenizer.currToken.str.length(); i++) {
-                Character c = tokenizer.currToken.str.charAt(i);
+            if (kind == TokenKind.String) {
+                Integer q0 = 0;
 
-                Map<Character, Set<Integer>> innerMap = new HashMap<>();
-                innerMap.put(c, new HashSet<>(Set.of(i+1)));
+                Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
 
-                d.put(i, innerMap);
+                for (int i = 0; i < tokenizer.currToken.str.length(); i++) {
+                    Character c = tokenizer.currToken.str.charAt(i);
+
+                    Map<Character, Set<Integer>> innerMap = new HashMap<>();
+                    innerMap.put(c, new HashSet<>(Set.of(i+1)));
+
+                    d.put(i, innerMap);
+                }
+
+                Integer endState = tokenizer.currToken.str.length();
+                d.put(endState, null);
+
+                tokenizer.nextToken();
+
+                return new NFA(q0, d, new HashSet<>(Set.of(endState)));
+            } else {
+                // epsilon case, build epsilon NFA
+                Integer q0 = 0;
+                var F = new HashSet<>(Set.of(q0));
+                Map<Integer, Map<Character, Set<Integer>>> d = new HashMap<>();
+                d.put(q0, null);
+
+                tokenizer.nextToken();
+
+                return new NFA(q0, d, F);
             }
-
-            Integer endState = tokenizer.currToken.str.length();
-            d.put(endState, null);
-
-            NFA nfa = new NFA(q0, d, new HashSet<>(Set.of(endState)));
-
-            tokenizer.nextToken();
-
-            return nfa;
-
         } else if (tokenizer.matchToken(TokenKind.ParenOpen)) {
             NFA nfa = parseExpr();
             tokenizer.expectToken(TokenKind.ParenClose);

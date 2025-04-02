@@ -147,6 +147,22 @@ public class Main {
             testCase(nfa, "abf", false);
             testCase(nfa, "ag", false);
         }
+
+        {
+            String input = "$";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "", true);
+            testCase(nfa, "$", false);
+            testCase(nfa, "a", false);
+            testCase(nfa, "b", false);
+            testCase(nfa, "asdfqewr", false);
+        }
     }
 
     public static void concatTests() {
@@ -211,7 +227,7 @@ public class Main {
 
     public static void pptTests() {
         {
-            String input = "0(01+10)1";
+            String input = "0(01+10)1+$";
             System.out.printf("Test Suite: \"%s\"\n", input);
 
             Tokenizer tokenizer = new Tokenizer(input);
@@ -221,12 +237,13 @@ public class Main {
 
             testCase(nfa, "0011", true);
             testCase(nfa, "0101", true);
+            testCase(nfa, "", true);
             testCase(nfa, "1010", false);
             testCase(nfa, "001", false);
         }
 
         {
-            String input = "(0+1)*";
+            String input = "0(0+1)*1";
             System.out.printf("Test Suite: \"%s\"\n", input);
 
             Tokenizer tokenizer = new Tokenizer(input);
@@ -234,9 +251,12 @@ public class Main {
 
             NFA nfa = parser.parseExpr();
 
-            testCase(nfa, "", true);
+            testCase(nfa, "01", true);
             testCase(nfa, "0111", true);
             testCase(nfa, "011010101", true);
+            testCase(nfa, "", false);
+            testCase(nfa, "10", false);
+            testCase(nfa, "1000001", false);
         }
 
         {
@@ -252,6 +272,23 @@ public class Main {
             testCase(nfa, "0111", true);
             testCase(nfa, "011010101", true);
             testCase(nfa, "101010100011001", false);
+        }
+
+        {
+            String input = "(0+$)(10)*(1+$)";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+            testCase(nfa, "01", true);
+            testCase(nfa, "10", true);
+            testCase(nfa, "1010", true);
+            testCase(nfa, "0101", true);
+            testCase(nfa, "011", false);
+            testCase(nfa, "0011", false);
+            testCase(nfa, "010110101", false);
         }
 
         {
@@ -273,7 +310,7 @@ public class Main {
         }
 
         {
-            String input = "((0*1)(0*1))*0*";
+            String input = "((0*1)^2)*0*";
             System.out.printf("Test Suite: \"%s\"\n", input);
 
             Tokenizer tokenizer = new Tokenizer(input);
@@ -311,9 +348,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        // TODO: Add ^ operator as well for shorthand
-        // TODO: Handle all characters
-        // TODO: Handle epsilon characters as well?
+        // TODO: Handle all characters (escape characters)
 
         BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 
