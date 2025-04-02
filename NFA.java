@@ -229,6 +229,8 @@ public class NFA {
                         if (c == '\0') {
                             color = "red";
                             c = 'ε';
+                        } else if (c == ' ') {
+                            c = '⍽'; // "space"
                         }
 
                         System.out.printf("%d -> %d [label = %c color = %s]\n", entry.getKey(), q, c, color);

@@ -1,0 +1,84 @@
+<svg width="467pt" height="78pt" viewBox="0.00 0.00 467.00 78.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 74)">
+<title>finite_state_machine</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-74 463,-74 463,4 -4,4"/>
+<!-- start -->
+<g id="node1" class="node">
+<title>start</title>
+<text text-anchor="middle" x="27" y="-17.8" font-family="Times,serif" font-size="14.00">start</text>
+</g>
+<!-- 4 -->
+<g id="node6" class="node">
+<title>4</title>
+<ellipse fill="none" stroke="black" cx="113" cy="-22" rx="18" ry="18"/>
+<ellipse fill="none" stroke="black" cx="113" cy="-22" rx="22" ry="22"/>
+<text text-anchor="middle" x="113" y="-17.8" font-family="Times,serif" font-size="14.00">4</text>
+</g>
+<!-- start&#45;&gt;4 -->
+<g id="edge1" class="edge">
+<title>start-&gt;4</title>
+<path fill="none" stroke="black" d="M53.66,-22C61.73,-22 70.75,-22 79.24,-22"/>
+<polygon fill="black" stroke="black" points="79.22,-25.5 89.22,-22 79.22,-18.5 79.22,-25.5"/>
+</g>
+<!-- 0 -->
+<g id="node2" class="node">
+<title>0</title>
+<ellipse fill="none" stroke="black" cx="196" cy="-22" rx="18" ry="18"/>
+<text text-anchor="middle" x="196" y="-17.8" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- 1 -->
+<g id="node3" class="node">
+<title>1</title>
+<ellipse fill="none" stroke="black" cx="275" cy="-52" rx="18" ry="18"/>
+<text text-anchor="middle" x="275" y="-47.8" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- 0&#45;&gt;1 -->
+<g id="edge2" class="edge">
+<title>0-&gt;1</title>
+<path fill="none" stroke="black" d="M213.33,-28.36C223.13,-32.18 235.84,-37.13 247.09,-41.52"/>
+<polygon fill="black" stroke="black" points="245.7,-44.73 256.28,-45.1 248.24,-38.21 245.7,-44.73"/>
+<text text-anchor="middle" x="235.5" y="-42.1" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- 2 -->
+<g id="node4" class="node">
+<title>2</title>
+<ellipse fill="none" stroke="black" cx="354" cy="-52" rx="18" ry="18"/>
+<text text-anchor="middle" x="354" y="-47.8" font-family="Times,serif" font-size="14.00">2</text>
+</g>
+<!-- 1&#45;&gt;2 -->
+<g id="edge3" class="edge">
+<title>1-&gt;2</title>
+<path fill="none" stroke="red" d="M293.47,-52C302.53,-52 313.83,-52 324.14,-52"/>
+<polygon fill="red" stroke="red" points="324.08,-55.5 334.08,-52 324.08,-48.5 324.08,-55.5"/>
+<text text-anchor="middle" x="314.5" y="-56.2" font-family="Times,serif" font-size="14.00">ε</text>
+</g>
+<!-- 3 -->
+<g id="node5" class="node">
+<title>3</title>
+<ellipse fill="none" stroke="black" cx="437" cy="-22" rx="18" ry="18"/>
+<ellipse fill="none" stroke="black" cx="437" cy="-22" rx="22" ry="22"/>
+<text text-anchor="middle" x="437" y="-17.8" font-family="Times,serif" font-size="14.00">3</text>
+</g>
+<!-- 2&#45;&gt;3 -->
+<g id="edge4" class="edge">
+<title>2-&gt;3</title>
+<path fill="none" stroke="black" d="M371.39,-45.93C381.13,-42.32 393.79,-37.63 405.33,-33.36"/>
+<polygon fill="black" stroke="black" points="406.32,-36.72 414.48,-29.97 403.89,-30.16 406.32,-36.72"/>
+<text text-anchor="middle" x="393.5" y="-43" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- 3&#45;&gt;0 -->
+<g id="edge5" class="edge">
+<title>3-&gt;0</title>
+<path fill="none" stroke="red" d="M414.6,-22C371.5,-22 274.24,-22 225.69,-22"/>
+<polygon fill="red" stroke="red" points="225.7,-18.5 215.7,-22 225.7,-25.5 225.7,-18.5"/>
+<text text-anchor="middle" x="314.5" y="-26.2" font-family="Times,serif" font-size="14.00">ε</text>
+</g>
+<!-- 4&#45;&gt;0 -->
+<g id="edge6" class="edge">
+<title>4-&gt;0</title>
+<path fill="none" stroke="red" d="M135.28,-22C144.78,-22 156.12,-22 166.35,-22"/>
+<polygon fill="red" stroke="red" points="166.16,-25.5 176.16,-22 166.16,-18.5 166.16,-25.5"/>
+<text text-anchor="middle" x="156.5" y="-26.2" font-family="Times,serif" font-size="14.00">ε</text>
+</g>
+</g>
+</svg>

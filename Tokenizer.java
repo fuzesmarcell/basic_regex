@@ -97,23 +97,47 @@ public class Tokenizer {
                     int endPos = pos;
                     do {
                         char nextC = input.charAt(endPos);
-                        if (nextC == '(' || nextC == ')' ||
-                            nextC == '*' || nextC == '+' ||
-                            nextC == '^' || nextC == '$') {
-                            break;
+                        boolean isEscaped = false;
+                        if (nextC == '\\') {
+                            if (pos+1 >= input.length())
+                                throw new RuntimeException("Expected escape character");
+
+                            nextC = input.charAt(++endPos);
+                            isEscaped = true;
                         }
+
+                        if (!isEscaped) {
+                            if (nextC == '(' || nextC == ')' ||
+                                nextC == '*' || nextC == '+' ||
+                                nextC == '^' || nextC == '$') {
+                                break;
+                            }
+                        }
+
                     } while (++endPos < input.length());
 
                     if (endPos - pos > 1) {
                         if (endPos < input.length()) {
                             char nextC = input.charAt(endPos);
-                            if (nextC == '*') {
+                            char prevC = input.charAt(endPos-1);
+                            if (prevC != '\\' && nextC == '*') {
                                 endPos -= 1;
                             }
                         }
                     }
 
-                    result.str = input.substring(pos, endPos);
+                    String rawStr = input.substring(pos, endPos);
+                    StringBuilder str = new StringBuilder();
+                    for (int i = 0; i < rawStr.length(); i++) {
+                        char currC = rawStr.charAt(i);
+                        if (currC == '\\') {
+                            str.append(rawStr.charAt(++i));
+                        } else {
+                            str.append(currC);
+                        }
+                    }
+
+                    result.str = str.toString();
                     pos = endPos;
                 }
 

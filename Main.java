@@ -163,6 +163,32 @@ public class Main {
             testCase(nfa, "b", false);
             testCase(nfa, "asdfqewr", false);
         }
+
+        {
+            String input = "\\*";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "*", true);
+            testCase(nfa, "\\*", false);
+        }
+
+        {
+            String input = "\\\\";
+            System.out.printf("Test Suite: \"%s\"\n", input);
+
+            Tokenizer tokenizer = new Tokenizer(input);
+            RegexParser parser = new RegexParser(tokenizer);
+
+            NFA nfa = parser.parseExpr();
+
+            testCase(nfa, "\\", true);
+            testCase(nfa, "\\\\", false);
+        }
     }
 
     public static void concatTests() {
