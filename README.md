@@ -9,11 +9,14 @@ to decide if the input string is detected or not.
 
 ## Usage
 Union operator match a or b `a+b`
+
 Concatenation operator `ab` you can use `^` to define multiple concatenations `a^3` is equivalent to `aaa`
+
 Kleene iteration matches a or nothing (epsilon) `a*`
+
 Match nothing is defined as the dollar symbol `$`
 
-A few example regexes and the resulting NFA
+### A few example regexes and the resulting NFA
 
 ### `a+b`
 
