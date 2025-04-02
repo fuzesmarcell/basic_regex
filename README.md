@@ -16,6 +16,8 @@ Kleene iteration matches a or nothing (epsilon) `a*`
 
 Match nothing is defined as the dollar symbol `$`
 
+The operator precedence is `parens > kleene > concat > union`
+
 ### A few example regexes and the resulting NFA
 
 ### `a+b`
