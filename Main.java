@@ -374,8 +374,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        // TODO: Handle all characters (escape characters)
-
         BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 
         while (true) {
